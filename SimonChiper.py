@@ -293,14 +293,9 @@ class SimonCipher(object):
                 raise
         return self.iv
 
-# def publish(topic, message):
-# 	client.publish(topic, message)
-
 def prints_en(plaintext, encrypted_message, date_now):
 	print("Plaintext\t: ", plaintext)
 	print("Encrypted\t: ", hex(encrypted_message))
-	print("Length\t\t: ", len(enc_len), "Bytes")
-	# print("Just published a message to topic SIMON at "+ date_now)
 
 def prints_de(decrypted_message):
     print("Decrypted\t: ", decrypted_message)
@@ -310,16 +305,12 @@ start = timeit.default_timer()
 
 for i in range(2):
     
-    # mess = 0x10a #input mess dlm hexa
     mess = randint (100,1100)
 
-    # ciphers = SimonCipher(0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100, 96, 48, 'ECB')
-    ciphers = SimonCipher(0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100, 192, 128, 'CBC', init=1)
+    # ciphers = SimonCipher(0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100, 96, 48, 'ECB') #SIMON IN ECB MODE
+    ciphers = SimonCipher(0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100, 192, 128, 'CBC', init=1) # SIMON IN CBC MODE
     
     t = ciphers.encrypt(mess)
-    # print ('Simon  : ', block_size, key_size)
-    # print ('key     : ', key)
-
     print("Message\t\t: ", hex(mess))
     print("Ciphertext\t: ", t)
     print("ciphertext (hex): " ,hex(t))
@@ -328,11 +319,7 @@ for i in range(2):
     print("Plaintext (hex)\t: ", hex(dec))
     print("Plaintext\t: ", dec)
     print('\n')
-    
-    scale = 16
-    res = bin(int(hex(t), scale)).zfill(8)
-    # print("Encrypted binary\t:\t", str(res))
 
 stop = timeit.default_timer()
 encryption_duration = stop - start
-print("Waktu akumulasi : "+str(encryption_duration))
+print("Accumulation time : "+str(encryption_duration))

@@ -1,8 +1,11 @@
-from __future__ import print_function
-import timeit
-import binascii
-from collections import deque
 from random import randint
+from time import sleep
+from collections import deque
+import timeit
+from datetime import datetime
+import json
+import binascii
+import sys
 
 class SimonCipher(object):
     """Simon Block Cipher Object"""
@@ -121,7 +124,7 @@ class SimonCipher(object):
 
             new_k = c_z ^ rs_1 ^ rs_3 ^ k_reg[m - 1]
 
-            self.key_schedule.append(k_reg.pop())
+            self.key_schedule.append(k_reg.pop())            
             k_reg.appendleft(new_k)
 
     def encrypt_round(self, x, y, k):
@@ -292,34 +295,81 @@ class SimonCipher(object):
                 print('Please provide IV as int')
                 raise
         return self.iv
-
-def prints_en(plaintext, encrypted_message, date_now):
-	print("Plaintext\t: ", plaintext)
-	print("Encrypted\t: ", hex(encrypted_message))
-
-def prints_de(decrypted_message):
-    print("Decrypted\t: ", decrypted_message)
-    print("\n")
-
+        
+def print_en(mess,plaintext, encrypted_message,date_now,binary):
+    print("Message\t\t: ",mess)
+    print("Plaintext\t: ", (plaintext))
+    print("Plaintext binary: ",binary)
+    print("Encrypted\t: ", str(encrypted_message)[2:])
+    print("Length\t\t: ", len(str(encrypted_message)[2:]), "Bytes")
+    print("Just published a message to topic Simon at "+ date_now)
+    
+def print_de(decrypted_message):
+    print("Decrypted\t: ", (decrypted_message))
+    
+def pencatatan1(i, date_now, plaintext, encrypted_message, encryption_periode):
+    f = open('Simon.csv', 'a')
+    f.write("Message ke-" + i + ";" + str(plaintext) + ";" + encrypted_message + ";"  + str(encryption_periode)+";" + date_now +  "\n")    
+ 
+def getBinary(word):
+    return int(binascii.hexlify(word), 16)
+    
+# Record the start time
 start = timeit.default_timer()
 
-for i in range(2):
-    
-    mess = randint (100,1100)
+key = 0x1FE2548B4A0D14DC7677770989767657
 
-    # ciphers = SimonCipher(0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100, 96, 48, 'ECB') #SIMON IN ECB MODE
-    ciphers = SimonCipher(0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100, 192, 128, 'CBC', init=1) # SIMON IN CBC MODE
-    
-    t = ciphers.encrypt(mess)
-    print("Message\t\t: ", hex(mess))
-    print("Ciphertext\t: ", t)
-    print("ciphertext (hex): " ,hex(t))
-    
-    dec = ciphers.decrypt(t)
-    print("Plaintext (hex)\t: ", hex(dec))
-    print("Plaintext\t: ", dec)
-    print('\n')
+#key = 0x1f1e1d1c1b1a19181716151413121110
+#key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a0908
+# key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
+cipher = SimonCipher(key, key_size=128, block_size=64, mode='ECB')
+# cipher = SimonCipher(key, 128, 128, 'CBC', 0x123456789ABCDEF0)
+message ={}
 
+for i in range(1):
+    # Creating random integer as paintext
+    start1 = timeit.default_timer()    
+    mess = 'va:2.213' #pesan
+    plaintext= int.from_bytes(mess.encode('utf-8'), byteorder='big', signed=False) #ubah ke decimal
+
+    scale = 16
+    binary = (bin((plaintext)).replace("0b","")).zfill(64) #ubah ke binary
+
+    # Encrypting the plaintext
+    encrypted_message = hex(cipher.encrypt(plaintext))
+    date_now = str(datetime.now().timestamp())
+    
+    
+    # Make the JSON data
+    message['cipher'] = encrypted_message
+    message['datetime'] = date_now
+    stringify = json.dumps(message, indent=2)
+
+    #Decrypting the ciphertext
+    hexa = int(encrypted_message,16)
+    decrypted_message1 = cipher.decrypt(hexa)
+    decrypted_message = hex(decrypted_message1)
+    print(decrypted_message)
+
+    #Str decrypted message
+    Message= bytes.fromhex(decrypted_message[2:].decode('utf-8')) #ubah dec ke string
+    print(message)
+    # Displaying the Encryption data
+    print_en(mess, plaintext, encrypted_message, date_now,binary)
+
+    # Displaying the Encryption data
+    print_de(decrypted_message)
+    
+    stop1 = timeit.default_timer()
+    encryption_periode = stop1 - start1
+    print("Waktu akumulasi : "+str(encryption_periode))
+    
+    # Make the data record
+    # pencatatan1(str(i+1), date_now, plaintext, encrypted_message, encryption_periode)
+    print()
+    
+# Record the finished time
 stop = timeit.default_timer()
 encryption_duration = stop - start
-print("Accumulation time : "+str(encryption_duration))
+print("Waktu Total : "+str(encryption_duration))
+

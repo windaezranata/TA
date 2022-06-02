@@ -314,25 +314,25 @@ class SpeckCipher(object):
     def getBinary(word):
         return int(binascii.hexlify(word), 16)
 
-def print_en(plaintext, encrypted_message,date_now,binary):
-    print("Plaintext\t: ", plaintext)
+def print_en(mess,plaintext, encrypted_message,date_now,binary):
+    print("Message\t\t: ",mess)
+    print("Plaintext\t: ", hex(plaintext))
     print("Plaintext binary: ",binary)
     print("Encrypted\t: ", str(encrypted_message)[2:])
-    print("Length\t\t: ", len(encrypted_message), "Bytes")
-    print("Just published a message to topic Speck at "+ date_now)
+    print("Length\t\t: ", len(str(encrypted_message)[2:]), "Bytes")
+    print("Just published a message to topic Simon at "+ date_now)
     
-def print_de(decrypted_message):
-    print("Decrypted\t: ", decrypted_message)
+def print_de(decrypted_message,message):
+    print("Decrypted\t: ", (decrypted_message))
+    print("Message_Dec\t: ",message)
     
-# def pencatatan(i, date_now, plaintext, encrypted_message):
-#     f = open('Publish_Simon.csv', 'a')
-#     f.write("Message ke-" + i + ";" + str(plaintext) + ";" + encrypted_message + ";" + date_now + "\n")    
-
 def pencatatan1(i, date_now, plaintext, encrypted_message, encryption_periode):
     f = open('Speck.csv', 'a')
     f.write("Message ke-" + i + ";" + str(plaintext) + ";" + encrypted_message + ";"  + str(encryption_periode)+";" + date_now +  "\n")    
     
-
+def getBinary(word):
+    return int(binascii.hexlify(word), 16)
+    
 # Record the start time
 start = timeit.default_timer()
 
@@ -341,21 +341,21 @@ key = 0x1FE2548B4A0D14DC7677770989767657
 #key = 0x1f1e1d1c1b1a19181716151413121110
 #key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a0908
 # key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
-cipher = SpeckCipher(key,key_size=128, block_size=64, mode='ECB')
-# cipher = SpeckCipher(key, 128, 128, 'CBC', 0x123456789ABCDEF0)
+cipher = SpeckCipher(key, key_size=128, block_size=64, mode='ECB')
+# cipher = SimonCipher(key, 128, 128, 'CBC', 0x123456789ABCDEF0)
 message ={}
 
-for i in range(10):
+for i in range(1):
     # Creating random integer as paintext
     start1 = timeit.default_timer()    
-    plaintext = randint (0,0xFFFFFFFFFFFFFFFF)
-    # plaintext = 14
+    mess = 'dl:98765435678va:2.213rf:123.45Tm:100.00Hm:' #pesan max 8
+    plaintext= int.from_bytes(mess.encode('utf-8'), byteorder='big', signed=False) #ubah ke decimal
+
     scale = 16
-    binary = (bin((plaintext)).replace("0b","")).zfill(64)
-    # print("Plaintext binary: ", str(res))
+    binary = (bin((plaintext)).replace("0b","")).zfill(64) #ubah ke binary
 
     # Encrypting the plaintext
-    encrypted_message = str(hex(cipher.encrypt(plaintext)))[2:]
+    encrypted_message = hex(cipher.encrypt(plaintext))
     date_now = str(datetime.now().timestamp())
     
     
@@ -366,13 +366,17 @@ for i in range(10):
 
     #Decrypting the ciphertext
     hexa = int(encrypted_message,16)
-    decrypted_message = cipher.decrypt(hexa)
+    decrypted_message1 = cipher.decrypt(hexa)
+    decrypted_message = hex(decrypted_message1)
+
+    #Str decrypted message
+    message=bytes.fromhex(decrypted_message[2:]).decode('utf-8')
 
     # Displaying the Encryption data
-    print_en(plaintext, encrypted_message, date_now, binary)
+    print_en(mess, plaintext, encrypted_message, date_now,binary)
 
     # Displaying the Encryption data
-    print_de(decrypted_message)
+    print_de(decrypted_message,message)
     
     stop1 = timeit.default_timer()
     encryption_periode = stop1 - start1
@@ -381,8 +385,8 @@ for i in range(10):
     # Make the data record
     # pencatatan1(str(i+1), date_now, plaintext, encrypted_message, encryption_periode)
     print()
+    
 # Record the finished time
 stop = timeit.default_timer()
 encryption_duration = stop - start
 print("Waktu Total : "+str(encryption_duration))
-

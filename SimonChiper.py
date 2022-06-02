@@ -298,14 +298,16 @@ class SimonCipher(object):
         
 def print_en(mess,plaintext, encrypted_message,date_now,binary):
     print("Message\t\t: ",mess)
-    print("Plaintext\t: ", (plaintext))
+    print("Plaintext\t: ", hex(plaintext))
     print("Plaintext binary: ",binary)
     print("Encrypted\t: ", str(encrypted_message)[2:])
     print("Length\t\t: ", len(str(encrypted_message)[2:]), "Bytes")
     print("Just published a message to topic Simon at "+ date_now)
     
-def print_de(decrypted_message):
+def print_de(decrypted_message,message):
     print("Decrypted\t: ", (decrypted_message))
+    print("Message_Dec\t: ",message)
+
     
 def pencatatan1(i, date_now, plaintext, encrypted_message, encryption_periode):
     f = open('Simon.csv', 'a')
@@ -329,7 +331,7 @@ message ={}
 for i in range(1):
     # Creating random integer as paintext
     start1 = timeit.default_timer()    
-    mess = 'va:2.213' #pesan
+    mess = 'dl:98765435678va:2.213rf:123.45Tm:100.00Hm:' #pesan max 8
     plaintext= int.from_bytes(mess.encode('utf-8'), byteorder='big', signed=False) #ubah ke decimal
 
     scale = 16
@@ -349,16 +351,15 @@ for i in range(1):
     hexa = int(encrypted_message,16)
     decrypted_message1 = cipher.decrypt(hexa)
     decrypted_message = hex(decrypted_message1)
-    print(decrypted_message)
 
     #Str decrypted message
-    Message= bytes.fromhex(decrypted_message[2:].decode('utf-8')) #ubah dec ke string
-    print(message)
+    message=bytes.fromhex(decrypted_message[2:]).decode('utf-8')
+
     # Displaying the Encryption data
     print_en(mess, plaintext, encrypted_message, date_now,binary)
 
     # Displaying the Encryption data
-    print_de(decrypted_message)
+    print_de(decrypted_message,message)
     
     stop1 = timeit.default_timer()
     encryption_periode = stop1 - start1
@@ -372,4 +373,3 @@ for i in range(1):
 stop = timeit.default_timer()
 encryption_duration = stop - start
 print("Waktu Total : "+str(encryption_duration))
-

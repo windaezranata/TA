@@ -324,8 +324,8 @@ key = 0x1FE2548B4A0D14DC7677770989767657
 #key = 0x1f1e1d1c1b1a19181716151413121110
 #key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a0908
 # key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
-key_size=128
-block_size=64
+key_size=96
+block_size=48
 
 cipher = SimonCipher(key, key_size, block_size, mode='ECB')
 message ={}
@@ -340,19 +340,21 @@ for r in range(1):
     #fragmenting the message
 
     if block_size==32 :
-        n = 4	# every 4 characters
+        n = 4	# every 6 characters
         split_mess = [mess[i:i+n] for i in range(0, len(mess), n)]
         
         for x in split_mess:
             plaintext= int.from_bytes(split_mess[i].encode('utf-8'), byteorder='big', signed=False) #ubah ke decimal
+            # print("Plaint: ",hex(plaintext))
             i=i+1
             scale = 16
             # binary = (bin((plaintext)).replace("0b","")).zfill(64) #ubah ke binary
             
             # Encrypting the plaintext
             encrypted_message = hex(cipher.encrypt(plaintext))
-            ct=(encrypted_message.replace("0x",""))
-            enc.append(ct.zfill(8))
+            ct=(encrypted_message[2:].zfill(8))
+            print("Cipher:", ct)
+            enc.append(ct)
             
             date_now = str(datetime.now().timestamp())
         a=""
@@ -365,30 +367,33 @@ for r in range(1):
         for x in split_ct:
             c_t= int(split_ct[i],16)
             i=i+1
+            # print("split_Ci: ", hex(c_t))
             #decrypt ciphertext
             decrypted_message = cipher.decrypt(c_t) 
             decrypted_message1 = hex(decrypted_message)
-            
+            # print("dec:",decrypted_message1)
             # Decode ciphertext
             message=bytes.fromhex(decrypted_message1[2:]).decode('utf-8')
             dec.append(message)        
         b=""
         plaintext = b.join(dec)
         
-    elif block_size==48 :
+    if block_size==48 :
         n = 6	# every 6 characters
         split_mess = [mess[i:i+n] for i in range(0, len(mess), n)]
         
         for x in split_mess:
             plaintext= int.from_bytes(split_mess[i].encode('utf-8'), byteorder='big', signed=False) #ubah ke decimal
+            # print("Plaint: ",hex(plaintext))
             i=i+1
             scale = 16
             # binary = (bin((plaintext)).replace("0b","")).zfill(64) #ubah ke binary
             
             # Encrypting the plaintext
             encrypted_message = hex(cipher.encrypt(plaintext))
-            ct=(encrypted_message.replace("0x",""))
-            enc.append(ct.zfill(8))
+            ct=(encrypted_message[2:].zfill(12))
+            # print("Cipher:", ct)
+            enc.append(ct)
             
             date_now = str(datetime.now().timestamp())
         a=""
@@ -401,10 +406,11 @@ for r in range(1):
         for x in split_ct:
             c_t= int(split_ct[i],16)
             i=i+1
+            # print("split_Ci: ", hex(c_t))
             #decrypt ciphertext
             decrypted_message = cipher.decrypt(c_t) 
             decrypted_message1 = hex(decrypted_message)
-            
+            # print("dec:",decrypted_message1)
             # Decode ciphertext
             message=bytes.fromhex(decrypted_message1[2:]).decode('utf-8')
             dec.append(message)        
@@ -417,14 +423,16 @@ for r in range(1):
         
         for x in split_mess:
             plaintext= int.from_bytes(split_mess[i].encode('utf-8'), byteorder='big', signed=False) #ubah ke decimal
+            # print("Plaint: ",hex(plaintext))
             i=i+1
             scale = 16
             # binary = (bin((plaintext)).replace("0b","")).zfill(64) #ubah ke binary
             
             # Encrypting the plaintext
             encrypted_message = hex(cipher.encrypt(plaintext))
-            ct=(encrypted_message.replace("0x",""))
-            enc.append(ct.zfill(8))
+            ct=(encrypted_message[2:].zfill(16))
+            # print("Cipher:", ct)
+            enc.append(ct)
             
             date_now = str(datetime.now().timestamp())
         a=""
@@ -437,10 +445,11 @@ for r in range(1):
         for x in split_ct:
             c_t= int(split_ct[i],16)
             i=i+1
+            # print("split_Ci: ", hex(c_t))
             #decrypt ciphertext
             decrypted_message = cipher.decrypt(c_t) 
             decrypted_message1 = hex(decrypted_message)
-            
+            # print("dec:",decrypted_message1)
             # Decode ciphertext
             message=bytes.fromhex(decrypted_message1[2:]).decode('utf-8')
             dec.append(message)        

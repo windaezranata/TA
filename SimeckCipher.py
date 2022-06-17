@@ -8,6 +8,7 @@ from datetime import datetime
 import json
 import binascii
 
+
 NUM_ROUNDS = {
     # (block_size, key_size): num_rounds
     (32, 64): 32,
@@ -63,7 +64,7 @@ class SimeckCipher:
             left = right ^ (left & self._LROT(left, 5)) \
             ^ self._LROT(left, 1) ^ round_key
             right = temp
-        # print hex(round_key), hex(left), hex(right)
+
         return left, right
 
     def change_key(self, master_key):
@@ -109,79 +110,174 @@ class SimeckCipher:
         plaintext = (left << self._word_size) | right
         return plaintext
 
-def print_en(mess,plaintext, encrypted_message,date_now,binary):
+def print_en(mess, ciphertext,):
     print("Message\t\t: ",mess)
-    print("Plaintext\t: ", hex(plaintext))
-    print("Plaintext binary: ",binary)
-    print("Encrypted\t: ", str(encrypted_message)[2:])
-    print("Length\t\t: ", len(str(encrypted_message)[2:]), "Bytes")
-    print("Just published a message to topic Simon at "+ date_now)
+    print("Block Size\t: ", block_size)
+    print("Key Size\t: ",key_size)
+    print("Ciphertext\t: ", ciphertext, "\n")
+    print("Length\t\t: ", len(ciphertext), "Bytes")
+    # print("Just published a message to topic Simon at "+ date_now, "\n")
     
-def print_de(decrypted_message,message):
-    print("Decrypted\t: ", (decrypted_message))
-    print("Message_Dec\t: ",message)
+def print_de(plaintext):
+    print("Decrypt Message\t: ",plaintext)
+
     
-def pencatatan1(i, date_now, plaintext, encrypted_message, encryption_periode):
-    f = open('Speck.csv', 'a')
-    f.write("Message ke-" + i + ";" + str(plaintext) + ";" + encrypted_message + ";"  + str(encryption_periode)+";" + date_now +  "\n")    
-    
+def pencatatan1(r, date_now, mess, ciphertext, encryption_periode):
+    f = open('Simon.csv', 'a')
+    f.write("Message ke-" + str(r+1) + ";" + str(mess) + ";" + str(ciphertext) + ";"  + str(encryption_periode)+";" + date_now +  "\n")    
+ 
 def getBinary(word):
     return int(binascii.hexlify(word), 16)
     
 # Record the start time
 start = timeit.default_timer()
-
-key = 0x1FE2548B4A0D14DC7677770989767657
+# key = 0x1FE2548B4A0D14DC # max 16 kar. utk block size 32
+key = 0x1FE2548B4A0D14DC7677770989767657  
 
 #key = 0x1f1e1d1c1b1a19181716151413121110
 #key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a0908
 # key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
-cipher = SimeckCipher(master_key=key, key_size=128, block_size=64)
-# cipher = SimonCipher(key, 128, 128, 'CBC', 0x123456789ABCDEF0)
+key_size=128
+block_size=64
+
+cipher = SimeckCipher(master_key=key, key_size=key_size, block_size=block_size)
 message ={}
 
-for i in range(1):
+for r in range(1):
     # Creating random integer as paintext
     start1 = timeit.default_timer()    
-    mess = 'dl:98765' #pesan max 8
-    plaintext= int.from_bytes(mess.encode('utf-8'), byteorder='big', signed=False) #ubah ke decimal
+    mess = 'dl:98765435678va:2.213rf:123.45Tm:100.00Hm:872798.99' 
+    enc = []
+    dec=[]
+    i=0
+    #fragmenting the message
 
-    scale = 16
-    binary = (bin((plaintext)).replace("0b","")).zfill(64) #ubah ke binary
+    #fragmenting the message
 
-    # Encrypting the plaintext
-    encrypted_message = hex(cipher.encrypt(plaintext))
-    date_now = str(datetime.now().timestamp())
+    if block_size==32 :
+        n = 4	# every 6 characters
+        split_mess = [mess[i:i+n] for i in range(0, len(mess), n)]
+        
+        for x in split_mess:
+            plaintext= int.from_bytes(split_mess[i].encode('utf-8'), byteorder='big', signed=False) #ubah ke decimal
+            i=i+1
+            scale = 16
+            # binary = (bin((plaintext)).replace("0b","")).zfill(64) #ubah ke binary
+            
+            # Encrypting the plaintext
+            encrypted_message = hex(cipher.encrypt(plaintext))
+            ct=(encrypted_message[2:].zfill(8))
+            enc.append(ct)
+            
+            date_now = str(datetime.now().timestamp())
+        a=""
+        ciphertext = a.join(enc) #ciphertext
+        
+        # Split the ciphertext
+        c=8;i=0
+        split_ct = [ciphertext[i:i+c] for i in range(0, len(ciphertext), c)]
+        
+        for x in split_ct:
+            c_t= int(split_ct[i],16)
+            i=i+1
+
+            #decrypt ciphertext
+            decrypted_message = cipher.decrypt(c_t) 
+            decrypted_message1 = hex(decrypted_message)
+
+            # Decode ciphertext
+            message=bytes.fromhex(decrypted_message1[2:]).decode('utf-8')
+            dec.append(message)        
+        b=""
+        plaintext = b.join(dec)
+        
+    if block_size==48 :
+        n = 6	# every 6 characters
+        split_mess = [mess[i:i+n] for i in range(0, len(mess), n)]
+        
+        for x in split_mess:
+            plaintext= int.from_bytes(split_mess[i].encode('utf-8'), byteorder='big', signed=False) #ubah ke decimal
+            i=i+1
+            scale = 16
+            # binary = (bin((plaintext)).replace("0b","")).zfill(64) #ubah ke binary
+            
+            # Encrypting the plaintext
+            encrypted_message = hex(cipher.encrypt(plaintext))
+            ct=(encrypted_message[2:].zfill(12))
+            enc.append(ct)
+            
+            date_now = str(datetime.now().timestamp())
+        a=""
+        ciphertext = a.join(enc) #ciphertext
+        
+        # Split the ciphertext
+        c=12;i=0
+        split_ct = [ciphertext[i:i+c] for i in range(0, len(ciphertext), c)]
+        
+        for x in split_ct:
+            c_t= int(split_ct[i],16)
+            i=i+1
+
+            #decrypt ciphertext
+            decrypted_message = cipher.decrypt(c_t) 
+            decrypted_message1 = hex(decrypted_message)
+
+            # Decode ciphertext
+            message=bytes.fromhex(decrypted_message1[2:]).decode('utf-8')
+            dec.append(message)        
+        b=""
+        plaintext = b.join(dec)
+
+    elif block_size==64 :
+        n = 8	# every 6 characters
+        split_mess = [mess[i:i+n] for i in range(0, len(mess), n)]
+        
+        for x in split_mess:
+            plaintext= int.from_bytes(split_mess[i].encode('utf-8'), byteorder='big', signed=False) #ubah ke decimal
+            i=i+1
+            scale = 16
+            # binary = (bin((plaintext)).replace("0b","")).zfill(64) #ubah ke binary
+            
+            # Encrypting the plaintext
+            encrypted_message = hex(cipher.encrypt(plaintext))
+            ct=(encrypted_message[2:].zfill(16))
+            enc.append(ct)
+            
+            date_now = str(datetime.now().timestamp())
+        a=""
+        ciphertext = a.join(enc) #ciphertext
+        
+        # Split the ciphertext
+        c=16;i=0
+        split_ct = [ciphertext[i:i+c] for i in range(0, len(ciphertext), c)]
+        
+        for x in split_ct:
+            c_t= int(split_ct[i],16)
+            i=i+1
+
+            #decrypt ciphertext
+            decrypted_message = cipher.decrypt(c_t) 
+            decrypted_message1 = hex(decrypted_message)
+
+            # Decode ciphertext
+            message=bytes.fromhex(decrypted_message1[2:]).decode('utf-8')
+            dec.append(message)        
+        b=""
+        plaintext = b.join(dec)
     
+    print_en(mess, ciphertext)
+    print_de(plaintext)
     
-    # Make the JSON data
-    message['cipher'] = encrypted_message
-    message['datetime'] = date_now
-    stringify = json.dumps(message, indent=2)
-
-    #Decrypting the ciphertext
-    hexa = int(encrypted_message,16)
-    decrypted_message1 = cipher.decrypt(hexa)
-    decrypted_message = hex(decrypted_message1)
-
-    #Str decrypted message
-    message=bytes.fromhex(decrypted_message[2:]).decode('utf-8')
-
-    # Displaying the Encryption data
-    print_en(mess, plaintext, encrypted_message, date_now,binary)
-
-    # Displaying the Encryption data
-    print_de(decrypted_message,message)
     
     stop1 = timeit.default_timer()
     encryption_periode = stop1 - start1
     print("Waktu akumulasi : "+str(encryption_periode))
     
     # Make the data record
-    # pencatatan1(str(i+1), date_now, plaintext, encrypted_message, encryption_periode)
+    # pencatatan1(r, date_now, mess, ciphertext, encryption_periode)    
     print()
     
-# Record the finished time
-stop = timeit.default_timer()
-encryption_duration = stop - start
-print("Waktu Total : "+str(encryption_duration))
+# # Record the finished time
+# stop = timeit.default_timer()
+# encryption_duration = stop - start
+# print("Waktu Total : "+str(encryption_duration))

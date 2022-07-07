@@ -131,23 +131,25 @@ def getBinary(word):
 
 def encrypt_dt(msg):    
     # Record the start time
-    # start = timeit.default_timer()
-
-    key = 0x1FE2548B4A0D14DC7677770989767657
-    #key = 0x1f1e1d1c1b1a19181716151413121110
-    #key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a0908
-    #key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
-    
+    start = timeit.default_timer()
     key_size=64
     block_size=32
-    cipher = SimeckCipher(master_key=key, key_size=128, block_size=64)
-    
+    i=0
+
+    key = 0x1FE2548B4A0D14DC
+    # key = 0x1FE2548B4A0D14DC76777709
+    # key = 0x1FE2548B4A0D14DC7677770989767657
+
+    cipher = SimeckCipher(master_key=key, key_size=key_size, block_size=block_size)
+
+    # message ={}
+
     for r in range(1):
         # Creating random integer as paintext
         start1 = timeit.default_timer()    
         
         mess= msg 
-        s=24;l=0
+        s=40;l=0
         split_mess = [mess[l:l+s] for l in range(0, len(mess), s)]
         mess= str(split_mess[l])
         enc2=[]
@@ -180,8 +182,7 @@ def encrypt_dt(msg):
             if block_size==48 :
                 n = 6	# every 6 characters
                 split_mess = [m[i:i+n] for i in range(0, len(m), n)]
-                while("" in split_mess) :
-                    split_mess.remove("")
+                
                 for x in split_mess:
                     plaintext= int.from_bytes(split_mess[i].encode('utf-8'), byteorder='big', signed=False) #ubah ke decimal
                     i=i+1
@@ -201,8 +202,7 @@ def encrypt_dt(msg):
             elif block_size==64 :
                 n = 8	# every 6 characters
                 split_mess = [m[i:i+n] for i in range(0, len(m), n)]
-                while("" in split_mess) :
-                    split_mess.remove("")
+                
                 for x in split_mess:
                     plaintext= int.from_bytes(split_mess[i].encode('utf-8'), byteorder='big', signed=False) #ubah ke decimal
                     i=i+1
@@ -228,11 +228,12 @@ def encrypt_dt(msg):
     print("Waktu akumulasi : "+str(encryption_periode))
 
     # Make the data record
-    pencatatan(r, mess, ciphertxt, encryption_periode,block_size,key_size,date_now)
+    pencatatan(r, mess,date_now, ciphertxt, encryption_periode,block_size,key_size) 
+    print()
     print("Encrypted msg : "+ciphertxt)
-    return (ciphertxt)
+    # return ciphertext
 
-# # Record the finished time
-# stop = timeit.default_timer()
-# encryption_duration = stop - start
-# print("Waktu Total : "+str(encryption_duration))
+    # # Record the finished time
+    # stop = timeit.default_timer()
+    # encryption_duration = stop - start
+    # print("Waktu Total : "+str(encryption_duration))

@@ -136,7 +136,6 @@ def decrypt_dt(cipher_txt):
     key = 0x1FE2548B4A0D14DC #use when key_size=64
     # key = 0x1FE2548B4A0D14DC76777709 #use when key_size=96
     # key = 0x1FE2548B4A0D14DC7677770989767657 #use when key_size=128
-    
     key_size=64
     block_size=32
     i=0
@@ -145,9 +144,9 @@ def decrypt_dt(cipher_txt):
     message ={}
 
     for r in range(1):
-        # Creating random integer as paintext
+            # Creating random integer as paintext
         start1 = timeit.default_timer()    
-        mess = cipher_txt 
+        mess = 'd7b4b7e55dd3d98febeea0d381e620d231b9c528ceca58b17d5fb6373fe3fc843b6f824a95d5ae67a4b3dceb914d58f119f16090ff4ca6bfb70a2e8173e32329849ba7aba142272a' 
         dec2 = []
         dec=[]
 
@@ -215,7 +214,7 @@ def decrypt_dt(cipher_txt):
             a=""
             plaintext = a.join(dec)
             dec2.append(plaintext)
-        
+            
     b=""
     plaintxt=b.join(dec2)
     print("Plaintext: "+plaintxt)
@@ -228,10 +227,10 @@ def decrypt_dt(cipher_txt):
     print("Waktu akumulasi : "+str(encryption_periode))
 
     # Make the data record
-    pencatatan(r, mess,date_now, plaintxt, encryption_periode,block_size,key_size)    
-    return(plaintxt)        
-    
-# # Record the finished time
-# stop = timeit.default_timer()
-# encryption_duration = stop - start
-# print("Waktu Total : "+str(encryption_duration))
+    # pencatatan(r, mess,date_now, plaintxt, encryption_periode,block_size,key_size)    
+    print()        
+        
+    # # Record the finished time
+    # stop = timeit.default_timer()
+    # encryption_duration = stop - start
+    # print("Waktu Total : "+str(encryption_duration))
